@@ -8,7 +8,7 @@ str3:	.asciiz "\n"
 str4:	.asciiz "Computadores I"
 	.eqv print_string,4
 	.text
-	.globl main
+	#.globl main
 	
 main:	addiu $sp,$sp,-4
 	sw $ra,0($sp)

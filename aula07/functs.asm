@@ -1,8 +1,12 @@
+	.data
+virg:	.asciiz ", "
 	.text
 	.globl strlen
 	.globl strrev
 	.globl strcpy
 	.globl strcat
+	.globl insert
+	.globl print_array
 	
 #STRLEN (determina e devolve a dimensão de uma string)
 #Mapa de registos
@@ -93,10 +97,11 @@ stcyew:		sw $ra,0($sp)		#retorna do stack
 #$a0 - $0(p)
 #$a1 - $s1
 #*p - $s2
-strcat:		addiu $sp,$sp,-12 	#cria espaço no stack
+strcat:		addiu $sp,$sp,-16 	#cria espaço no stack
 		sw $ra,0($sp)		#para salvaguardas
 		sw $s0,4($sp)		#os registos $ra, $s0, $s1
 		sw $s1,8($sp)		#
+		sw $s2,12($sp)
 		
 		move $s0, $a0		#$s0 = p = dst
 		move $s1, $a1		#$s1 = src
@@ -115,3 +120,50 @@ stcaew:		move $a0,$s0
 		lw $s2,12($sp)
 		addiu $sp,$sp,16
 		jr $ra			#termina a sub-rotina
+
+# exa1 ------
+#insert (insere Value na pos do array de size)
+#Mapa de Registos
+# $t0 -> i
+# $t1 -> *array[i]
+# $t2 -> array[i]
+
+insert:		move $t0,$a3		# int i = size;
+		sub $t0,$t0,1		# int i = size - 1;
+		
+if_ins:		ble $a2,$a3,else_ins	# if( pos > size)
+		li $v0,1		#
+		jr $ra			#	return 1;
+		
+else_ins:	blt $t0,$a2,end_ins	#else{ for{ i >= pos ){
+		sll $t1,$t0,2		#	$t1 = i * 4
+		addu $t1,$t1,$a0	#       $t1 = *array[i]
+		lw $t2,0($t1)		#	$t2 = array[i]
+		sw $t2,4($t1)		#	array[i+1] = array[i]
+		sub $t0,$t0,1		#	i--;
+		j else_ins		#	}
+end_ins:	sll $t1,$a2,2		#   $t1 = pos*4;
+		addu $t1,$t1,$a0 	#   $t1 = *array[pos]
+		sw $a1,0($t1)		#   array[pos] = value
+		li $v0,0		#
+		jr $ra			#	return 1;
+
+#print_array (imprime array a de n elementos)
+print_array:	move $t0,$a0		#  $t0 = *a
+		move $t1,$a1		#  $t1 = n
+		sll $t1,$t1,2		#  $t1 = n*4
+		add $t1,$t1,$a0		#  $t1 = *p = a + n
+
+for_p_a:	bge $t0,$t1,end_p_a	#  for( a < p ){
+		lw $a0, 0($t0)		# $a0 = *a
+		li $v0,1		#
+		syscall			# print_int10(*a)
+		la $a0,virg		# $a0 = ','
+		li $v0,4		#
+		syscall			# print_string(", ")
+		addiu $t0,$t0,4		# a++
+		j for_p_a		#  }
+end_p_a:	jr $ra			# }
+
+		
+		

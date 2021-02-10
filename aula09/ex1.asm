@@ -9,7 +9,7 @@ n_l:	.asciiz "\n"
 	.eqv p_str, 4
         
         .text
-        .globl main
+        #.globl main
 main:   
         li $v0,r_i         # do{
         syscall            #
@@ -25,7 +25,7 @@ main:
 	
 	la $a0,n_l         #
 	li $v0,p_str       #
-	syscall            # print_float("\n");
+	syscall            # print_string("\n");
 	
 	la $t0,z           #
 	l.s $f8,0($t0)     # $f8 = 0.0
